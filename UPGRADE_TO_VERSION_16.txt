@@ -1,0 +1,13 @@
+CHURCHCARE VERSION 16 — PHONE-FRIENDLY UPDATE
+
+1. Keep your existing configured supabase-config.js.
+2. Replace index.html, styles.css and app.js in your GitHub repository.
+3. Upload/retain the assets folder and .nojekyll.
+4. Commit the changes and wait for GitHub Pages to redeploy.
+
+PHONE CHANGES
+- The large left-side phone drawer is replaced by a compact bottom sheet.
+- Home, Attendance, Members and Programs remain in the fixed bottom navigation.
+- The More sheet contains Classification, Visitors, Shepherds, History, Member Care, Reports and Settings.
+- The phone header is smaller and no longer allows controls to crowd or expand the page.
+- Existing Supabase data and database structure remain compatible.
