@@ -1,0 +1,14 @@
+{
+  "name": "Faithful City ChurchCare",
+  "short_name": "ChurchCare",
+  "description": "Church attendance, shepherding and member care",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f6f1",
+  "theme_color": "#1f5d20",
+  "icons": [
+    { "src": "assets/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" },
+    { "src": "assets/favicon.png", "sizes": "any", "type": "image/png", "purpose": "any" }
+  ]
+}
