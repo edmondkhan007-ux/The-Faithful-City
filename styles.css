@@ -3526,3 +3526,31 @@ body { background: radial-gradient(ellipse at 8% 0%, rgba(210,234,205,.72), tran
 @media (min-width: 861px) {
   .topbar { min-height: 0; margin: 18px 0 22px; padding: 20px 22px; border: 1px solid rgba(255,255,255,.86); border-bottom: 1px solid rgba(255,255,255,.86); border-radius: 24px; background: rgba(255,255,255,.76); box-shadow: 0 14px 38px rgba(31,70,45,.09), inset 0 1px 0 rgba(255,255,255,.92); backdrop-filter: blur(18px) saturate(145%); -webkit-backdrop-filter: blur(18px) saturate(145%); }
 }
+
+
+/* Quick anonymous visitor headcount for phone attendance taking */
+.visitor-headcount-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 12px 0 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--paper);
+}
+.visitor-headcount-copy { display: grid; gap: 4px; min-width: 0; }
+.visitor-headcount-copy strong { color: var(--ink); }
+.visitor-headcount-copy small { color: var(--muted); line-height: 1.4; }
+.visitor-headcount-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.visitor-headcount-actions > strong { min-width: 26px; text-align: center; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.visitor-count-minus { min-width: 40px; min-height: 42px; padding: 8px 12px; font-size: 1.25rem; }
+.visitor-count-minus:disabled { opacity: .45; cursor: not-allowed; }
+.visitor-count-plus { min-height: 42px; white-space: nowrap; }
+@media (max-width: 560px) {
+  .visitor-headcount-controls { align-items: stretch; flex-direction: column; gap: 12px; padding: 13px; }
+  .visitor-headcount-actions { display: grid; grid-template-columns: 44px 1fr 1.5fr; gap: 8px; }
+  .visitor-count-plus { width: 100%; padding-inline: 10px; }
+  .visitor-count-minus { width: 44px; }
+}
