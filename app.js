@@ -1322,14 +1322,51 @@ function renderClassification() {
   }).join('') : '<tr><td colspan="7"><div class="empty-state">No Green, Red or unclassified members match this search.</div></td></tr>';
 }
 
-function exportClassificationCsv() {
-  const rows = [['Member Name','Phone','Shepherd','Sunday Consecutive Misses','Thursday Consecutive Misses','Classification','Reason','Admin Message']];
-  getClassificationMembers().forEach(({member,classification}) => {
+function exportClassificationExcel() {
+  if (!window.XLSX) {
+    showToast('The Excel library did not load. Please refresh the page and try again.');
+    return;
+  }
+
+  const items = getClassificationMembers();
+  const columns = [
+    'Member Name', 'Phone', 'Shepherd', 'Role', 'Ministry Status',
+    'Sunday Consecutive Misses', 'Thursday Consecutive Misses',
+    'Classification', 'Reason', 'Admin Message'
+  ];
+  const toRow = ({ member, classification }) => {
     const shepherd = getMemberShepherd(member);
-    rows.push([member.name, member.phone || '', shepherd?.name || '', classification.sundayMisses, classification.thursdayMisses, classificationLabel(classification.zone), classification.reason, classification.adminMessage]);
-  });
-  const csv = rows.map(row => row.map(csvEscape).join(',')).join('\n');
-  downloadFile('faithful-city-member-classification.csv', '\ufeff' + csv, 'text/csv;charset=utf-8');
+    return {
+      'Member Name': member.name || '',
+      'Phone': member.phone || '',
+      'Shepherd': shepherd?.name || (member.role === 'shepherd' ? 'Registered shepherd' : 'Unassigned'),
+      'Role': member.role || '',
+      'Ministry Status': ministryStatusLabel(getMemberMinistryStatus(member)),
+      'Sunday Consecutive Misses': classification.sundayMisses ?? 0,
+      'Thursday Consecutive Misses': classification.thursdayMisses ?? 0,
+      'Classification': classificationLabel(classification.zone),
+      'Reason': classification.reason || '',
+      'Admin Message': classification.adminMessage || ''
+    };
+  };
+
+  const activeRows = items
+    .filter(item => item.classification.zone === 'active')
+    .map(toRow);
+  const inactiveRows = items
+    .filter(item => item.classification.zone !== 'active')
+    .map(toRow);
+
+  const workbook = XLSX.utils.book_new();
+  const activeSheet = XLSX.utils.json_to_sheet(activeRows, { header: columns });
+  const inactiveSheet = XLSX.utils.json_to_sheet(inactiveRows, { header: columns });
+  activeSheet['!cols'] = columns.map(column => ({ wch: Math.max(column.length + 2, 18) }));
+  inactiveSheet['!cols'] = columns.map(column => ({ wch: Math.max(column.length + 2, 18) }));
+  XLSX.utils.book_append_sheet(workbook, activeSheet, 'Active');
+  XLSX.utils.book_append_sheet(workbook, inactiveSheet, 'Inactive');
+
+  XLSX.writeFile(workbook, `faithful-city-member-classification-${isoToday()}.xlsx`, { compression: true });
+  showToast(`Excel downloaded: ${activeRows.length} active and ${inactiveRows.length} inactive/unclassified members.`);
 }
 
 function renderVisitors() {
@@ -3378,7 +3415,7 @@ document.getElementById('exportAllMeetingsExcelSecondary')?.addEventListener('cl
 document.getElementById('exportAllMeetingsExcelHistory')?.addEventListener('click', exportAllMeetingsExcel);
 document.getElementById('exportSemesterMatrixCsv')?.addEventListener('click', exportSemesterMatrixCsv);
 document.getElementById('exportSemesterMatrixCsvSecondary')?.addEventListener('click', exportSemesterMatrixCsv);
-document.getElementById('exportClassificationCsv')?.addEventListener('click', exportClassificationCsv);
+document.getElementById('exportClassificationExcel')?.addEventListener('click', exportClassificationExcel);
 document.getElementById('authLoginForm')?.addEventListener('submit', signInToChurchCare);
 document.getElementById('signOutBtn')?.addEventListener('click', signOutOfChurchCare);
 document.getElementById('mobileSignOutBtn')?.addEventListener('click', signOutOfChurchCare);
