@@ -404,7 +404,15 @@
           <div class="register-section-label"><span>Registered members</span><small>Absence is calculated only from registered members.</small></div>
           <div class="attendance-register" id="attendanceRegister"></div>
 
-          <div class="register-section-label visitor-label"><span>Visitors and new attendees today</span><small>These people count toward total attendance and can later be converted to members.</small></div>
+          <div class="register-section-label visitor-label"><span>Visitors and new attendees today</span><small>Named visitors can be recorded below. For visitors whose names you do not have, use the headcount button.</small></div>
+          <div class="visitor-headcount-controls" aria-label="Unnamed visitor headcount">
+            <div class="visitor-headcount-copy"><strong>Visitors without names</strong><small>Tap once for each unnamed visitor attending this service.</small></div>
+            <div class="visitor-headcount-actions">
+              <button class="btn btn-soft visitor-count-minus" id="removeAnonymousVisitorBtn" type="button" aria-label="Remove one unnamed visitor" disabled>−</button>
+              <strong id="anonymousVisitorCount" aria-live="polite">0</strong>
+              <button class="btn btn-gold visitor-count-plus" id="addAnonymousVisitorBtn" type="button">+1 Visitor</button>
+            </div>
+          </div>
           <div class="visitor-register" id="todayVisitors"></div>
 
           <div class="register-footer">
