@@ -1074,7 +1074,7 @@ function getRecordStats(record) {
   const eligibleMembers = state.members.filter(member => isMemberEligibleOnDate(member, record.date));
   const present = record.presentMemberIds.filter(id => eligibleMembers.some(member => member.id === id)).length;
   const absent = Math.max(0, eligibleMembers.length - present);
-  const visitors = record.visitorIds?.length || 0;
+  const visitors = (record.visitorIds?.length || 0) + Math.max(0, Number(record.anonymousVisitorCount) || 0);
   const total = present + visitors;
   const rate = eligibleMembers.length ? Math.round((present / eligibleMembers.length) * 100) : 0;
   return { present, absent, visitors, total, rate, eligible: eligibleMembers.length };
@@ -1540,6 +1540,7 @@ function loadAttendanceDraft() {
   attendanceDraft = {
     presentMemberIds: new Set((existing?.presentMemberIds || []).filter(id => { const member = getMember(id); return member && isMemberEligibleOnDate(member, date); })),
     visitorIds: new Set((existing?.visitorIds || []).filter(id => { const visitor = getVisitor(id); return visitor && (visitor.visitorStatus || 'active') === 'active'; })),
+    anonymousVisitorCount: Math.max(0, Number(existing?.anonymousVisitorCount) || 0),
     meta: {
       topic: existing?.topic || '',
       minister: existing?.minister || '',
@@ -1629,8 +1630,12 @@ function updateAttendanceCounts() {
   const { date } = currentAttendanceKey();
   const eligibleCount = state.members.filter(member => isMemberEligibleOnDate(member, date)).length;
   const absent = Math.max(0, eligibleCount - present);
-  const visitors = attendanceDraft.visitorIds.size;
+  const visitors = attendanceDraft.visitorIds.size + Math.max(0, Number(attendanceDraft.anonymousVisitorCount) || 0);
   const total = present + visitors;
+  const anonymousCount = document.getElementById('anonymousVisitorCount');
+  if (anonymousCount) anonymousCount.textContent = Math.max(0, Number(attendanceDraft.anonymousVisitorCount) || 0);
+  const removeAnonymousBtn = document.getElementById('removeAnonymousVisitorBtn');
+  if (removeAnonymousBtn) removeAnonymousBtn.disabled = !(Number(attendanceDraft.anonymousVisitorCount) > 0);
   document.getElementById('presentCount').textContent = present;
   document.getElementById('absentCount').textContent = absent;
   document.getElementById('visitorCount').textContent = visitors;
@@ -1646,7 +1651,7 @@ function saveAttendanceRecord() {
 
   let record = state.services.find(item => item.date === date && (item.programId === programId || (!item.programId && item.service === service)));
   if (!record) {
-    record = { id: uid('service'), date, programId, service, eventType, semesterId, academicYear, calendarYear, presentMemberIds: [], visitorIds: [], topic: '', minister: '', scripture: '', notes: '' };
+    record = { id: uid('service'), date, programId, service, eventType, semesterId, academicYear, calendarYear, presentMemberIds: [], visitorIds: [], anonymousVisitorCount: 0, topic: '', minister: '', scripture: '', notes: '' };
     state.services.push(record);
   }
   record.programId = programId;
@@ -1657,6 +1662,7 @@ function saveAttendanceRecord() {
   record.calendarYear = calendarYear;
   record.presentMemberIds = [...attendanceDraft.presentMemberIds];
   record.visitorIds = [...attendanceDraft.visitorIds];
+  record.anonymousVisitorCount = Math.max(0, Math.floor(Number(attendanceDraft.anonymousVisitorCount) || 0));
   record.topic = attendanceDraft.meta.topic;
   record.minister = attendanceDraft.meta.minister;
   record.scripture = attendanceDraft.meta.scripture;
@@ -3339,6 +3345,16 @@ document.getElementById('markAllPresent')?.addEventListener('click', () => {
 
 document.getElementById('clearAttendance')?.addEventListener('click', () => {
   attendanceDraft.presentMemberIds.clear();
+  renderAttendance();
+});
+
+document.getElementById('addAnonymousVisitorBtn')?.addEventListener('click', () => {
+  attendanceDraft.anonymousVisitorCount = Math.max(0, Number(attendanceDraft.anonymousVisitorCount) || 0) + 1;
+  renderAttendance();
+});
+
+document.getElementById('removeAnonymousVisitorBtn')?.addEventListener('click', () => {
+  attendanceDraft.anonymousVisitorCount = Math.max(0, (Number(attendanceDraft.anonymousVisitorCount) || 0) - 1);
   renderAttendance();
 });
 
