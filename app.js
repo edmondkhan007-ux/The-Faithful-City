@@ -3182,10 +3182,23 @@ function downloadFile(filename, content, type = 'text/plain;charset=utf-8') {
   const anchor = document.createElement('a');
   anchor.href = url;
   anchor.download = filename;
+  anchor.rel = 'noopener';
+  anchor.style.display = 'none';
   document.body.appendChild(anchor);
-  anchor.click();
+
+  // iOS Safari may not begin a Blob download before a URL revoked
+  // synchronously after click. Keep the object URL alive long enough
+  // for the browser to process the download.
+  try {
+    anchor.click();
+    showToast('Your download is being prepared. Check Files or Downloads.');
+  } catch (error) {
+    console.error('ChurchCare download failed:', error);
+    showToast('The download could not start. Please try again in Safari.');
+  }
+
   anchor.remove();
-  URL.revokeObjectURL(url);
+  window.setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
 function csvEscape(value) {
