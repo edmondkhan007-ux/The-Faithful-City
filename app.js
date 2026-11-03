@@ -3265,6 +3265,11 @@ function exportBackup() {
   downloadFile(`faithful-city-doxa-portal-backup-${isoToday()}.json`, JSON.stringify(state, null, 2), 'application/json');
 }
 
+function exportAllChurchData() {
+  downloadFile(`faithful-city-complete-church-data-${isoToday()}.json`, JSON.stringify(state, null, 2), 'application/json;charset=utf-8');
+  showToast('Complete ChurchCare data downloaded. Keep the file private and secure.');
+}
+
 function importBackup(file) {
   const reader = new FileReader();
   reader.onload = () => {
@@ -3426,6 +3431,7 @@ document.getElementById('importBackupBtn')?.addEventListener('click', () => docu
 document.getElementById('importBackupFile')?.addEventListener('change', event => { if (event.target.files?.[0]) importBackup(event.target.files[0]); event.target.value = ''; });
 document.getElementById('resetDemoData')?.addEventListener('click', resetDemoData);
 document.getElementById('settingsExportBackup')?.addEventListener('click', exportBackup);
+document.getElementById('settingsDownloadAllChurchData')?.addEventListener('click', exportAllChurchData);
 document.getElementById('dangerZoneExportBackup')?.addEventListener('click', exportBackup);
 document.getElementById('settingsImportBackup')?.addEventListener('click', () => document.getElementById('importBackupFile').click());
 document.getElementById('importMemberUpdateBtn')?.addEventListener('click', () => document.getElementById('importMemberUpdateFile').click());
